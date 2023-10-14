@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import make_interp_spline
 
+
+
+# Part 1: Browsing signals and displaying them:
+
 def load_file_path():
     file_path = filedialog.askopenfilename(defaultextension=".txt",
                                            filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
@@ -54,9 +58,9 @@ def plot_signal(indices, samples, use_interpolation = True):
         indices_new = np.linspace(min(indices), max(indices), 100) 
         spl = make_interp_spline(indices, samples, k = 3)
         samples_new = spl(indices_new) 
-        plt.plot(indices_new , samples_new, color='red')  
+        plt.plot(indices_new , samples_new, color='green')  
     else:
-        plt.plot(indices, samples, color='red')  
+        plt.plot(indices, samples, color='green')  
 
     plt.title("Continuous Form")
     plt.xlabel("Time")
@@ -74,3 +78,18 @@ def browse_signal():
         indices, samples = read_signal(file_path)
         plot_signal(indices, samples)
 
+# Part 2: Generating signals and displaying them:
+
+def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    print(amplitude)
+    print(wave_type)
+    print(analogue_frequency)
+    print(sampling_frequency)
+    print(phase_shift)
+
+
+def generate_signal():
+    print("needs implementation")
+
+def compare_outputs():
+    print("needs implementation")
