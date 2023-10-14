@@ -61,9 +61,11 @@ def open_generate_signal_window():
 
     # Buttons functions
 
-    btn_generate_signal.config(command=lambda: tsk1.compute_signal(txt_amplitude.get(), cmb_wave_type.get(), 
+    btn_generate_signal.config(command=lambda: tsk1.generate_signal(txt_amplitude.get(), cmb_wave_type.get(), 
                                                                     txt_analog_freq.get(),txt_sampling_freq.get(), txt_phase_shift.get()))
-
+    
+    btn_compare_output.config(command=lambda: tsk1.compare_outputs(txt_amplitude.get(), cmb_wave_type.get(), 
+                                                                    txt_analog_freq.get(),txt_sampling_freq.get(), txt_phase_shift.get()))
 
 # Color palette
 colors = {
@@ -102,8 +104,8 @@ btn_generate.bind("<Enter>", on_enter)
 btn_generate.bind("<Leave>", on_leave)
 
 # Buttons functions
-btn_generate.config(command=open_generate_signal_window)
 btn_browse.config(command = tsk1.browse_signal)
+btn_generate.config(command=open_generate_signal_window)
 
 # Start the Tkinter loop
 root.mainloop()

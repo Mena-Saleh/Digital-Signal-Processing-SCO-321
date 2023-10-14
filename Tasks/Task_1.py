@@ -1,9 +1,43 @@
 from tkinter import filedialog
 import matplotlib.pyplot as plt
 import numpy as np
+from tkinter import messagebox
 from scipy.interpolate import make_interp_spline
 
 
+# Evaluation function (given):
+
+def SignalSamplesAreEqual(file_name,indices,samples):
+    expected_indices=[]
+    expected_samples=[]
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
+            else:
+                break
+                
+    if len(expected_samples)!=len(samples):
+        print("Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(expected_samples)):
+        if abs(samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print("Test case failed, your signal have different values from the expected one") 
+            return
+    print("Test case passed successfully")
 
 # Part 1: Browsing signals and displaying them:
 
@@ -81,15 +115,32 @@ def browse_signal():
 # Part 2: Generating signals and displaying them:
 
 def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
-    print(amplitude)
-    print(wave_type)
-    print(analogue_frequency)
-    print(sampling_frequency)
-    print(phase_shift)
+    amplitude = int(amplitude)
+    analogue_frequency = int(analogue_frequency)
+    sampling_frequency = int(sampling_frequency)
+    phase_shift = float(phase_shift)
+
+    if(sampling_frequency < 2*analogue_frequency):
+        messagebox.showinfo("Error", "Sampling frequency must be greater than or equal twcie that of the analogue frequency.")
+        return
+    
+    indices = np.arange(sampling_frequency)
+    normalized_frequency = analogue_frequency/sampling_frequency
+    if(wave_type == "sin"):
+        samples = amplitude * np.sin(2 * np.pi * normalized_frequency * indices + phase_shift)
+    else:
+        samples = amplitude * np.cos(2 * np.pi * normalized_frequency * indices + phase_shift)
+    
+
+    return indices, samples
 
 
-def generate_signal():
-    print("needs implementation")
 
-def compare_outputs():
-    print("needs implementation")
+def generate_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    plot_signal(indices[:10], samples[:10], False)
+
+def compare_outputs(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    file_path = load_file_path()
+    SignalSamplesAreEqual(file_path, indices, samples)
