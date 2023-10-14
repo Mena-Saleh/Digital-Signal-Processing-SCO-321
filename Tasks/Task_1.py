@@ -114,6 +114,10 @@ def browse_signal():
 
 # Part 2: Generating signals and displaying them:
 
+def check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    if(amplitude == "" or wave_type == "" or analogue_frequency == "" or sampling_frequency == "" or phase_shift == ""):
+        messagebox.showerror("Error", "One or more fields are missing, please fill them all.")
+
 def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
     amplitude = int(amplitude)
     analogue_frequency = int(analogue_frequency)
@@ -121,7 +125,7 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
     phase_shift = float(phase_shift)
 
     if(sampling_frequency < 2*analogue_frequency):
-        messagebox.showinfo("Error", "Sampling frequency must be greater than or equal twcie that of the analogue frequency.")
+        messagebox.showinfo("Error", "Sampling frequency must be greater than or equal twice that of the analogue frequency.")
         return
     
     indices = np.arange(sampling_frequency)
@@ -134,13 +138,13 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
 
     return indices, samples
 
-
-
 def generate_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     plot_signal(indices[:10], samples[:10], False)
 
 def compare_outputs(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+    check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     file_path = load_file_path()
     SignalSamplesAreEqual(file_path, indices, samples)
