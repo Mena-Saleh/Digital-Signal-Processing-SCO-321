@@ -7,7 +7,7 @@ from scipy.interpolate import make_interp_spline
 
 # Evaluation function (given):
 
-def SignalSamplesAreEqual(file_name,indices,samples):
+def signal_samples_are_equal(file_name,indices,samples):
     expected_indices=[]
     expected_samples=[]
     with open(file_name, 'r') as f:
@@ -100,8 +100,6 @@ def plot_signal(indices, samples, use_interpolation = True):
     plt.xlabel("Time")
     plt.ylabel("Amplitude")
     plt.grid(True)
-    
-
 
     plt.tight_layout(pad=4.0)
     plt.show()
@@ -114,7 +112,7 @@ def browse_signal():
 
 # Part 2: Generating signals and displaying them:
 
-def check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
+def check_input_if_empty(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
     if(amplitude == "" or wave_type == "" or analogue_frequency == "" or sampling_frequency == "" or phase_shift == ""):
         messagebox.showerror("Error", "One or more fields are missing, please fill them all.")
 
@@ -124,8 +122,12 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
     sampling_frequency = int(sampling_frequency)
     phase_shift = float(phase_shift)
 
+    if (sampling_frequency <= 0):
+        messagebox.showerror("Error", "Sampling frequency must be greater than 0.")
+        return
+
     if(sampling_frequency < 2*analogue_frequency):
-        messagebox.showinfo("Error", "Sampling frequency must be greater than or equal twice that of the analogue frequency.")
+        messagebox.showerror("Error", "Sampling frequency must be greater than or equal twice that of the analogue frequency.")
         return
     
     indices = np.arange(sampling_frequency)
@@ -139,12 +141,12 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
     return indices, samples
 
 def generate_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
-    check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    check_input_if_empty(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
-    plot_signal(indices[:10], samples[:10], False)
+    plot_signal(indices[:40], samples[:40], False)
 
 def compare_outputs(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
-    check_input(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    check_input_if_empty(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     file_path = load_file_path()
-    SignalSamplesAreEqual(file_path, indices, samples)
+    signal_samples_are_equal(file_path, indices, samples)
