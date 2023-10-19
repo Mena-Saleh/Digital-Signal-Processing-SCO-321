@@ -80,7 +80,7 @@ def plot_signal(indices, samples, use_interpolation = True):
     plt.subplot(1, 2, 1)
     plt.scatter(indices, samples) 
     plt.title("Discrete Form")
-    plt.xlabel("Time")
+    plt.xlabel("Sample Indices")
     plt.ylabel("Amplitude")
     plt.grid(True)
     
@@ -97,7 +97,7 @@ def plot_signal(indices, samples, use_interpolation = True):
         plt.plot(indices, samples, color='green')  
 
     plt.title("Continuous Form")
-    plt.xlabel("Time")
+    plt.xlabel("Sample Indices")
     plt.ylabel("Amplitude")
     plt.grid(True)
 
@@ -131,6 +131,9 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
         return
     
     indices = np.arange(sampling_frequency)
+
+    samples_time = np.linspace(0,1,sampling_frequency)
+
     normalized_frequency = analogue_frequency/sampling_frequency
     if(wave_type == "sin"):
         samples = amplitude * np.sin(2 * np.pi * normalized_frequency * indices + phase_shift)
@@ -138,15 +141,15 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
         samples = amplitude * np.cos(2 * np.pi * normalized_frequency * indices + phase_shift)
     
 
-    return indices, samples
+    return samples_time, indices, samples
 
 def generate_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
     check_input_if_empty(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
-    indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    samples_time, indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     plot_signal(indices[:40], samples[:40], False)
 
 def compare_outputs(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):
     check_input_if_empty(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
-    indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
+    samples_time, indices, samples = compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift)
     file_path = load_file_path()
     signal_samples_are_equal(file_path, indices, samples)
