@@ -79,17 +79,22 @@ def plot_signal(indices, samples, use_interpolation = True):
     # Subplot 1: Discrete
     plt.subplot(1, 2, 1)
     plt.scatter(indices, samples) 
+
+    # Draw vertical lines from each point to the x-axis
+    plt.vlines(indices, 0, samples, linestyles='dashed')
+
     plt.title("Discrete Form")
-    plt.xlabel("Sample Indices")
+    plt.xlabel("Sample Index")
     plt.ylabel("Amplitude")
     plt.grid(True)
+
     
     # Subplot 2: Continuous
     plt.subplot(1, 2, 2)
 
     # Generate a curve using interpolation for smoothness (optional)
     if(use_interpolation):
-        indices_new = np.linspace(min(indices), max(indices), 100) 
+        indices_new = np.linspace(min(indices), max(indices), max(indices) * 20) 
         spl = make_interp_spline(indices, samples, k = 3)
         samples_new = spl(indices_new) 
         plt.plot(indices_new , samples_new, color='green')  
@@ -97,7 +102,7 @@ def plot_signal(indices, samples, use_interpolation = True):
         plt.plot(indices, samples, color='green')  
 
     plt.title("Continuous Form")
-    plt.xlabel("Sample Indices")
+    plt.xlabel("Sample Index")
     plt.ylabel("Amplitude")
     plt.grid(True)
 
@@ -131,10 +136,9 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
         return
     
     indices = np.arange(sampling_frequency)
-
     samples_time = np.linspace(0,1,sampling_frequency)
-
     normalized_frequency = analogue_frequency/sampling_frequency
+    
     if(wave_type == "sin"):
         samples = amplitude * np.sin(2 * np.pi * normalized_frequency * indices + phase_shift)
     else:
