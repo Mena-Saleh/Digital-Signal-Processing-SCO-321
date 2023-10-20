@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk 
 from Tasks import Task_1 as tsk1
-
-
+from  Tasks import  Task2 as tsk2
 # Functions and styling
 
 def on_enter(e):
@@ -67,6 +66,11 @@ def open_generate_signal_window():
     btn_compare_output.config(command=lambda: tsk1.compare_outputs(txt_amplitude.get(), cmb_wave_type.get(), 
                                                                     txt_analog_freq.get(),txt_sampling_freq.get(), txt_phase_shift.get()))
 
+    btn_compare_output.config(command=lambda: tsk1.compare_outputs(txt_amplitude.get(), cmb_wave_type.get(),
+                                                                   txt_analog_freq.get(), txt_sampling_freq.get(),
+                                                                   txt_phase_shift.get()))
+
+   # btn_operate.config(command=lambda: tsk2.do_operation()
 # Color palette
 colors = {
     "champagne": "#F2DFD7",
@@ -96,6 +100,17 @@ btn_browse.pack(pady=(40,10), padx=10)
 btn_generate = tk.Button(nav_frame, text="Generate Signals", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_generate.pack(pady=10, padx=10)
 
+operations_label = tk.Label(nav_frame, text="Select Operation",bg='gray', fg=colors["white"])
+operations_label.pack( padx=(10,10), pady=(30,0))
+cmb_operations = ttk.Combobox(nav_frame, values=["addition", "subtraction", "multiplication ","Squaring", "Shifting",
+                                                 "Normalization","Accumulation "], width=15)
+cmb_operations.pack(pady=10)
+
+btn_operate = tk.Button(nav_frame, text="ok", bg=colors["blue"], fg=colors["white"], width=8, height=1, relief="flat", bd=0)
+btn_operate.pack(pady=5, padx=5)
+
+
+
 # Hover effects
 btn_browse.bind("<Enter>", on_enter)
 btn_browse.bind("<Leave>", on_leave)
@@ -103,9 +118,13 @@ btn_browse.bind("<Leave>", on_leave)
 btn_generate.bind("<Enter>", on_enter)
 btn_generate.bind("<Leave>", on_leave)
 
+btn_operate.bind("<Enter>", on_enter)
+btn_operate.bind("<Leave>", on_leave)
+
 # Buttons functions
 btn_browse.config(command = tsk1.browse_signal)
 btn_generate.config(command=open_generate_signal_window)
+btn_operate.config(command=lambda: tsk2.do_operation(cmb_operations.get()))
 
 # Start the Tkinter loop
 root.mainloop()
