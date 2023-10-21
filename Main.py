@@ -70,7 +70,33 @@ def open_generate_signal_window():
                                                                    txt_analog_freq.get(), txt_sampling_freq.get(),
                                                                    txt_phase_shift.get()))
 
-   # btn_operate.config(command=lambda: tsk2.do_operation()
+
+def open_choose_multibly_constant_window():
+        multi_win = tk.Toplevel(root)
+        multi_win.title("choose constant")
+        multi_win.geometry("400x360")
+        multi_win.iconbitmap("Utils/Signaly.ico")
+
+        widget_width = 20
+
+        # Input fields
+        lbl_constant = tk.Label(multi_win, text="constant:")
+        lbl_constant.grid(row=0, column=0,padx=(50,10), pady=(50,5), sticky="e" )
+        txt_const = tk.Entry(multi_win, width=widget_width)
+        txt_const.grid(row=0, column=1, pady=(50, 5))
+
+        # Buttons
+        btn_multi_signal = tk.Button(multi_win, text="multibly", bg=colors["blue"], fg=colors["white"], width=15,
+                                        height=2, relief="flat", bd=0)
+        btn_multi_signal.grid(row=3, column=1, padx=(10,0), pady=(40, 20), sticky="e")
+
+        # Hover effects
+        btn_multi_signal.bind("<Enter>", on_enter)
+        btn_multi_signal.bind("<Leave>", on_leave)
+
+        btn_multi_signal.config(command=lambda :tsk2.do_operation("multiplication",txt_const.get()))
+
+
 # Color palette
 colors = {
     "champagne": "#F2DFD7",
@@ -92,7 +118,6 @@ root.iconbitmap("Utils/Signaly.ico")
 nav_frame = tk.Frame(root, bg=colors["thistle"])
 nav_frame.pack(side="left", fill="y")
 
-
 # Navigation buttons
 btn_browse = tk.Button(nav_frame, text="Browse Signals", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_browse.pack(pady=(40,10), padx=10)
@@ -102,7 +127,7 @@ btn_generate.pack(pady=10, padx=10)
 
 operations_label = tk.Label(nav_frame, text="Select Operation",bg='gray', fg=colors["white"])
 operations_label.pack( padx=(10,10), pady=(30,0))
-cmb_operations = ttk.Combobox(nav_frame, values=["addition", "subtraction", "multiplication ","Squaring", "Shifting",
+cmb_operations = ttk.Combobox(nav_frame, values=["addition", "subtraction", "multiplication","Squaring", "Shifting",
                                                  "Normalization","Accumulation "], width=15)
 cmb_operations.pack(pady=10)
 
@@ -124,8 +149,16 @@ btn_operate.bind("<Leave>", on_leave)
 # Buttons functions
 btn_browse.config(command = tsk1.browse_signal)
 btn_generate.config(command=open_generate_signal_window)
-btn_operate.config(command=lambda: tsk2.do_operation(cmb_operations.get()))
+def operate():
+    operation = cmb_operations.get()
+    if operation == 'multiplication':
+        open_choose_multibly_constant_window()
 
+    else:
+        tsk2.do_operation(operation, 1)
+
+
+btn_operate.config(command=operate)
 # Start the Tkinter loop
 root.mainloop()
 
