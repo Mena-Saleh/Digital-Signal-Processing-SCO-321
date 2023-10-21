@@ -30,6 +30,7 @@ def signal_samples_are_equal(file_name,indices,samples):
                 
     if len(expected_samples)!=len(samples):
         print("Test case failed, your signal have different length from the expected one")
+        messagebox.showwarning("Test case failed", "your signal have different length from the expected one")
         return
     for i in range(len(expected_samples)):
         if abs(samples[i] - expected_samples[i]) < 0.01:
@@ -38,6 +39,7 @@ def signal_samples_are_equal(file_name,indices,samples):
             print("Test case failed, your signal have different values from the expected one") 
             return
     print("Test case passed successfully")
+    messagebox.showinfo("Test case succeeded", "Test case passed successfully")
 
 # Part 1: Browsing signals and displaying them:
 
