@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import make_interp_spline
 from tkinter import messagebox
-
+import random
 
 # Evaluation function (given):
 
@@ -87,8 +87,23 @@ def plot_signals(indices_1, samples_1, indices_2,samples_2, result_indices , res
     
     plt.figure(figsize=(8, 6))
     plt.plot(indices_1, samples_1, label = "Signal 1", color='red')
-    plt.plot(indices_2, samples_2, label = "Signal 2",  color='blue')
+    if (samples_2 != 0):
+        plt.plot(indices_2, samples_2, label = "Signal 2",  color='blue')
     plt.plot(result_indices, result_sample, label = "Result", color='green')
+    plt.title(operation)
+    plt.xlabel("Sample Index")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+def plot_multiple_signals(list_of_indices, list_of_samples, result_indices, result_sample, operation):
+    
+    plt.figure(figsize=(8, 6))
+    for i in range(len(list_of_samples)):
+        random_color = (random.random(), random.random(), random.random())  # Random RGB color
+        plt.plot(list_of_indices[i], list_of_samples[i], label=f"Signal {i+1}", color=random_color)
+    plt.plot(result_indices, result_sample, label="Result", color='green')
     plt.title(operation)
     plt.xlabel("Sample Index")
     plt.ylabel("Amplitude")
@@ -118,14 +133,41 @@ def load_two_signals():
         return
     return indices_1, samples_1, indices_2, samples_2
         
+def load_multiple_file_paths():
+    file_paths = filedialog.askopenfilenames(defaultextension=".txt",
+                                              filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    return file_paths
+
+def load_multiple_signals():
+    file_paths = load_multiple_file_paths()
+
+    if not file_paths:
+        return
+
+    list_of_indices = []
+    list_of_samples = []
+
+    for file_path in file_paths:
+        indices, samples = read_signal(file_path)
+        list_of_indices.append(indices)
+        list_of_samples.append(samples)
+
+    if (len(list_of_indices) < 2):
+        messagebox.showerror("Error", "Must be at least two signals.")
+        return
+    if len(set(len(samples) for samples in list_of_samples)) != 1:
+        messagebox.showerror("Error", "All signals must have the same length.")
+        return
+
+    return list_of_indices, list_of_samples
 
 # Operation functions:
-def add_signals(samples_1, samples_2):
-    result = [s1 + s2 for s1, s2 in zip(samples_1, samples_2)]
-    return result
+
+def add_signals(list_of_samples):
+    return [sum(samples) for samples in zip(*list_of_samples)]
 
 def subtract_signals(samples_1, samples_2):
-    result = [s2 - s1 for s1, s2 in zip(samples_1, samples_2)]
+    result = [abs(s1 - s2) for s1, s2 in zip(samples_1, samples_2)]
     return result
 
 def multiply_signal(samples, const):
@@ -162,21 +204,29 @@ def do_operation(operation, shifting_value, normalization_type, multiplication_c
         messagebox.showerror("Error", "Please choose an operation.")
         return
     
-    if operation == "Addition" or operation == "Subtraction": 
+    if operation == "Subtraction": 
 
         indices_1, samples_1, indices_2, samples_2 = load_two_signals()
-        if operation == "Addition":
-            result_samples = add_signals(samples_1, samples_2)
-        else:
-            result_samples = subtract_signals(samples_1, samples_2)
-        
 
+        result_samples = subtract_signals(samples_1, samples_2)
+        
         if(isCompare):
             file_path = load_file_path()
-            print(result_samples)
             signal_samples_are_equal(file_path, 0, result_samples)
         else:
             plot_signals(indices_1, samples_1, indices_2, samples_2, indices_1, result_samples, operation)
+
+    elif operation == 'Addition':
+
+        list_of_indices, list_of_samples = load_multiple_signals()
+        result_samples = add_signals(list_of_samples)
+        
+        if(isCompare):
+            file_path = load_file_path()
+            signal_samples_are_equal(file_path, 0, result_samples)
+        else:
+            plot_multiple_signals(list_of_indices, list_of_samples, list_of_indices[0] , result_samples, operation)
+
 
     else:
         indices, samples = load_one_signal()
@@ -220,7 +270,6 @@ def do_operation(operation, shifting_value, normalization_type, multiplication_c
 
         if(isCompare):
             file_path = load_file_path()
-            print(result_samples)
             signal_samples_are_equal(file_path, 0, result_samples)
         else:
             plot_signals(indices, samples, 0, 0, indices, result_samples, operation)

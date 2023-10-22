@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk 
 from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
+
 # Functions and styling
 
 def on_enter(e):
