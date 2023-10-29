@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk 
 from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
-
+from Tasks import Task_3 as tsk3
 # Functions and styling
 
 def on_enter(e):
@@ -10,6 +10,8 @@ def on_enter(e):
 
 def on_leave(e):
     e.widget['background'] = colors["blue"]  # Change color back on mouse leave
+
+# Other windows
 
 def open_generate_signal_window():
     gen_win = tk.Toplevel(root)
@@ -122,6 +124,50 @@ def open_signal_operations_window():
     btn_operate.bind("<Enter>", on_enter)
     btn_operate.bind("<Leave>", on_leave)
 
+def open_signal_quantization_window():
+    quant_win = tk.Toplevel(root)
+    quant_win.title("Signal Quantization")
+    quant_win.geometry("400x300")
+    
+    widget_width = 20
+
+    # Input label and text box
+    input_label = tk.Label(quant_win, text="Input:")
+    input_label.grid(row=0, column=0, padx=30, pady=20, sticky="w")
+    
+    input_textbox = tk.Entry(quant_win, width=widget_width)
+    input_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="w")
+
+    # Quantize by label
+    quantize_by_label = tk.Label(quant_win, text="Quantize by:")
+    quantize_by_label.grid(row=1, column=0, padx=30, pady=5, sticky="w")
+    
+
+    # Radio buttons for "Number of bits" and "Number of levels"
+    radio_var = tk.IntVar()
+    radio_var.set(1)
+    
+    radio_bits = tk.Radiobutton(quant_win, text="Number of bits", variable=radio_var, value=1)
+    radio_bits.grid(row=2, column=0, padx=30, pady=10, sticky="w")
+    
+    radio_levels = tk.Radiobutton(quant_win, text="Number of levels", variable=radio_var, value=0)
+    radio_levels.grid(row=3, column=0, padx=30, pady=10, sticky="w")
+
+    
+    # Quantize Signal button
+    btn_quantize = tk.Button(quant_win, text="Quantize Signal", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+    btn_quantize.grid(row=4, column=0, columnspan=2, pady=20)
+
+
+    # Button functions
+    btn_quantize.config(command=lambda: tsk3.quantize_signal(input_textbox.get(), radio_var.get()))
+
+
+    # Hover effects
+    btn_quantize.bind("<Enter>", on_enter)
+    btn_quantize.bind("<Leave>", on_leave)
+
+
 # Color palette
 colors = {
     "champagne": "#F2DFD7",
@@ -154,6 +200,9 @@ btn_generate.pack(pady=10, padx=10)
 btn_signal_operations = tk.Button(nav_frame, text="Signal Operations", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_signal_operations.pack(pady=10, padx=10)
 
+btn_signal_quantization = tk.Button(nav_frame, text="Signal Quantization", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+btn_signal_quantization.pack(pady=10, padx=10)
+
 
 # Hover effects
 btn_browse.bind("<Enter>", on_enter)
@@ -165,12 +214,15 @@ btn_generate.bind("<Leave>", on_leave)
 btn_signal_operations.bind("<Enter>", on_enter)
 btn_signal_operations.bind("<Leave>", on_leave)
 
+btn_signal_quantization.bind("<Enter>", on_enter)
+btn_signal_quantization.bind("<Leave>", on_leave)
+
 # Buttons functions
 
 btn_browse.config(command = tsk1.browse_signal)
 btn_generate.config(command=open_generate_signal_window)
 btn_signal_operations.config(command=open_signal_operations_window)
-
+btn_signal_quantization.config(command=open_signal_quantization_window)
 
 # Start the Tkinter loop
 root.mainloop()

@@ -167,7 +167,7 @@ def add_signals(list_of_samples):
     return [sum(samples) for samples in zip(*list_of_samples)]
 
 def subtract_signals(samples_1, samples_2):
-    result = [abs(s1 - s2) for s1, s2 in zip(samples_1, samples_2)]
+    result = [s1 - s2 for s1, s2 in zip(samples_1, samples_2)]
     return result
 
 def multiply_signal(samples, const):
