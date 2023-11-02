@@ -112,7 +112,8 @@ def load_file_path():
         return -1
 
 def read_signal(file_path):
-    samples = []
+    indices=[]
+    samples=[]
 
     with open(file_path, 'r') as f:
         line = f.readline()
@@ -120,25 +121,45 @@ def read_signal(file_path):
         line = f.readline()
         line = f.readline()
         while line:
-            L = line.strip()
-            if len(L.split(' ')) == 2:
-                L = line.split(' ')
-                V2 = float(L[1])
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                indices.append(V1)
                 samples.append(V2)
                 line = f.readline()
             else:
                 break
-    return  samples
+    
+    return indices, samples
 
 def load_one_signal():
-    file_path1 = load_file_path()
-    if file_path1 != -1:
-         samples_1 = read_signal(file_path1)
-    return  samples_1
+    file_path = load_file_path()
+    if file_path != -1:
+        indices, samples = read_signal(file_path)
+    return indices, samples
+
+def plot_signal(indices, samples):
+
+    plt.figure(figsize=(6, 6)) 
+
+    # Scatter plot
+    plt.scatter(indices, samples) 
+
+    # Draw vertical lines from each point to the x-axis
+    plt.vlines(indices, 0, samples, linestyles='dashed')
+
+    plt.title("Discrete Form")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Quantized Amplitude")
+    plt.grid(True)
+
+    plt.show()
 
 # Main functions
 def quantize_signal(user_input, is_bits):
-    signal = load_one_signal()
+    indices, signal = load_one_signal()
     user_input = int(user_input)
 
     # Step 1: Find min and max amplitude
@@ -157,6 +178,8 @@ def quantize_signal(user_input, is_bits):
     # Step 3: Make ranges
     ranges = np.linspace(min_val, max_val, num_levels + 1)
 
+    print(ranges, "\n")
+
     # Step 4: Calculate mid point for each range
     mid_points = ranges[:-1] + delta / 2
 
@@ -173,10 +196,15 @@ def quantize_signal(user_input, is_bits):
 
     # Step 7: Encode interval numbers to binary
     binary_encoded_intervals = [format(int(interval) - 1, '0' + str(num_bits) + 'b') for interval in interval_numbers]
+
+    # Print results
     print("Range index:", interval_numbers, "\n")
     print("Quantized signal:", quantized_signal, "\n")
     print("Quantization error:", error, "\n")
     print("Binary encoding:", binary_encoded_intervals, "\n")
+
+    # Plot quantized signal
+    plot_signal(indices, quantized_signal)
 
     # Comparing results to output file
     file_path = load_file_path()

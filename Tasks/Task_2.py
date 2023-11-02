@@ -112,10 +112,10 @@ def plot_multiple_signals(list_of_indices, list_of_samples, result_indices, resu
     plt.show()
 
 def load_one_signal():
-    file_path1 = load_file_path()
-    if file_path1 != -1:
-        indices_1, samples_1 = read_signal(file_path1)
-    return indices_1, samples_1
+    file_path = load_file_path()
+    if file_path != -1:
+        indices, samples = read_signal(file_path)
+    return indices, samples
 
 def load_two_signals():
 
