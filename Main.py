@@ -3,6 +3,7 @@ from tkinter import ttk
 from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
 from Tasks import Task_3 as tsk3
+from Tasks import Task_4 as tsk4
 # Functions and styling
 
 def on_enter(e):
@@ -168,6 +169,40 @@ def open_signal_quantization_window():
     btn_quantize.bind("<Leave>", on_leave)
 
 
+def open_freq_domain_window():
+    quant_win = tk.Toplevel(root)
+    quant_win.title("freq domain")
+    quant_win.geometry("400x300")
+
+    widget_width = 20
+
+    input_label = tk.Label(quant_win, text="Sampling frequency:")
+    input_label.grid(row=0, column=0, padx=30, pady=20, sticky="w")
+
+    input_textbox = tk.Entry(quant_win, width=widget_width)
+    input_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="w")
+
+    radio_var = tk.IntVar()
+    radio_var.set(1)
+
+    radio_dft = tk.Radiobutton(quant_win, text="DFT", variable=radio_var, value=1)
+    radio_dft.grid(row=2, column=0, padx=30, pady=10, sticky="w")
+
+    radio_idft = tk.Radiobutton(quant_win, text="IDFT", variable=radio_var, value=0)
+    radio_idft.grid(row=3, column=0, padx=30, pady=10, sticky="w")
+
+    btn_load = tk.Button(quant_win, text="browse signal", bg=colors["blue"], fg=colors["white"], width=15,
+                             height=2, relief="flat", bd=0)
+    btn_load.grid(row=4, column=0, columnspan=2, pady=20)
+
+    # Button functions
+    btn_load.config(command=lambda: tsk4.freq_domain(input_textbox.get(), radio_var.get()))
+
+    # Hover effects
+    btn_load.bind("<Enter>", on_enter)
+    btn_load.bind("<Leave>", on_leave)
+
+
 # Color palette
 colors = {
     "champagne": "#F2DFD7",
@@ -203,6 +238,9 @@ btn_signal_operations.pack(pady=10, padx=10)
 btn_signal_quantization = tk.Button(nav_frame, text="Signal Quantization", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_signal_quantization.pack(pady=10, padx=10)
 
+btn_freq_domain = tk.Button(nav_frame, text="Frequency Domain", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+btn_freq_domain.pack(pady=10, padx=10)
+
 
 # Hover effects
 btn_browse.bind("<Enter>", on_enter)
@@ -217,12 +255,18 @@ btn_signal_operations.bind("<Leave>", on_leave)
 btn_signal_quantization.bind("<Enter>", on_enter)
 btn_signal_quantization.bind("<Leave>", on_leave)
 
+btn_freq_domain.bind("<Enter>", on_enter)
+btn_freq_domain.bind("<Leave>", on_leave)
+
 # Buttons functions
 
 btn_browse.config(command = tsk1.browse_signal)
 btn_generate.config(command=open_generate_signal_window)
 btn_signal_operations.config(command=open_signal_operations_window)
 btn_signal_quantization.config(command=open_signal_quantization_window)
+btn_freq_domain.config(command=open_freq_domain_window)
+
+
 
 # Start the Tkinter loop
 root.mainloop()
