@@ -107,8 +107,8 @@ def plot_frequency_domain_signal(frequency, amplitude, phase_shift):
 
     plt.show()
 
-def save_frequency_domain_signal(file_path, amplitude, phase_shift):
-    with open(file_path[:-4] + '_Frequency_Domain.txt', 'w') as f:
+def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Frequency_Domain.txt" ):
+    with open(file_path[:-4] + file_name_end, 'w') as f:
         f.writelines('0\n')
         f.writelines('1\n')
         f.writelines(str(len(amplitude)) + '\n')
@@ -124,6 +124,9 @@ def plot_time_domain_signal(indices, samples):
 
     # Draw vertical lines from each point to the x-axis
     plt.vlines(indices, 0, samples, linestyles='dashed')
+
+    # Horizontal line at y=0
+    plt.axhline(y=0, color='black', linewidth=1)
 
     plt.title("Discrete Form")
     plt.xlabel("Sample Index")
@@ -205,6 +208,7 @@ def polar_to_cartesian(amplitude, phase_shift):
         cartesian_points.append(cartesian_point)
     return cartesian_points
 
+
 # Main functions that call other functions
 
 
@@ -256,6 +260,33 @@ def domain_transform(sampling_frequency, isDFT):
         compare_IDFT_result(IDFT_result)
 
 
+def modify_components(index, new_amplitude, new_phase_shift):
 
+    index = int(index)
+    new_amplitude = float(new_amplitude)
+    new_phase_shift = float(new_phase_shift)
+
+    # Loading signal
+    amplitude, phase_shift, file_path = load_signal()
+    N = len(amplitude)
+    if (index > N):
+        messagebox.showerror("Error", "Index out of bounds.")
+        return
+    
+    # Saving old values
+    old_amplitude = amplitude[index]
+    old_phase_shift = phase_shift[index]
+
+    # Changing amplitude components
+    amplitude = [new_amplitude if abs(value - old_amplitude) < 0.01 else value for value in amplitude]
+
+    # Changing phase shift components
+    for i in range (N):
+        if abs(abs(phase_shift[i]) - old_phase_shift) < 0.01:
+            phase_shift[i] = math.copysign(1, phase_shift[i]) * new_phase_shift
+
+    # Saving to file
+    save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Modified.txt")
+    messagebox.showinfo("success", "Signal modified and saved to file successfully.")
 
 
