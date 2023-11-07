@@ -134,7 +134,7 @@ def read_signal(file_path):
     
     return indices, samples
 
-def load_one_signal():
+def load_signal():
     file_path = load_file_path()
     if file_path != -1:
         indices, samples = read_signal(file_path)
@@ -159,7 +159,7 @@ def plot_signal(indices, samples):
 
 # Main functions
 def quantize_signal(user_input, is_bits):
-    indices, signal = load_one_signal()
+    indices, signal = load_signal()
     user_input = int(user_input)
 
     # Step 1: Find min and max amplitude

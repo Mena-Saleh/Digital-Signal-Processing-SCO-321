@@ -8,6 +8,39 @@ import random
 import math
 
 
+# Test functions (given)
+
+# Use to test the Amplitude of DFT and IDFT
+def SignalComapreAmplitude(SignalInput = [] ,SignalOutput= []):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        for i in range(len(SignalInput)):
+            A=round(SignalInput[i])
+            B=round(SignalOutput[i])
+            if abs(A-B)>0.001:
+                return False
+            elif A!=B:
+                return False
+        return True
+
+# Use to test the PhaseShift of DFT
+def SignalComaprePhaseShift(SignalInput = [] ,SignalOutput= []):
+    if len(SignalInput) != len(SignalInput):
+        return False
+    else:
+        for i in range(len(SignalInput)):
+            A=round(SignalInput[i])
+            B=round(SignalOutput[i])
+            if abs(A-B)>0.0001:
+                return False
+            elif A!=B:
+                return False
+        return True
+
+
+# Helper functions
+
 def load_file_path():
     file_path = filedialog.askopenfilename(defaultextension=".txt",
                                            filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
@@ -15,7 +48,6 @@ def load_file_path():
         return file_path
     else:
         return -1
-
 
 def read_signal(file_path):
     indices = []
@@ -30,8 +62,8 @@ def read_signal(file_path):
             L = line.strip()
             if len(L.split(' ')) == 2:
                 L = line.split(' ')
-                V1 = int(L[0])
-                V2 = int(L[1])
+                V1 = float(L[0])
+                V2 = float(L[1])
                 indices.append(V1)
                 samples.append(V2)
                 line = f.readline()
@@ -39,63 +71,189 @@ def read_signal(file_path):
                 break
     return indices, samples
 
-def load_one_signal():
+def load_signal():
     file_path = load_file_path()
     if file_path != -1:
         indices, samples = read_signal(file_path)
-    return indices, samples
+    return indices, samples, file_path
 
+def plot_frequency_domain_signal(frequency, amplitude, phase_shift):
 
-def DFT():
-    indices, samples = load_one_signal()
+    plt.figure(figsize=(12, 6)) 
+    # Subplot 1: Frequency vs amplitude
+    plt.subplot(1, 2, 1)
+    plt.bar(frequency, amplitude, width = 2) 
+
+    plt.title('Frequency vs Amplitude')
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    
+    # Subplot 2: Frequency vs phase_shift
+    plt.subplot(1, 2, 2)
+    plt.bar(frequency, phase_shift, color='green', width = 2)
+
+    # Horizontal line at y=0
+    plt.axhline(y=0, color='black', linewidth=1)
+
+    plt.title('Frequency vs Phase')
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Phase (radians)')
+    plt.grid(True)
+
+    plt.tight_layout(pad=4.0)
+    plt.show()
+
+    plt.show()
+
+def save_frequency_domain_signal(file_path, amplitude, phase_shift):
+    with open(file_path[:-4] + '_Frequency_Domain.txt', 'w') as f:
+        f.writelines('0\n')
+        f.writelines('1\n')
+        f.writelines(str(len(amplitude)) + '\n')
+        for i in range(len(amplitude)):
+            f.write(str(amplitude[i]) + ' ' + str(phase_shift[i]) + '\n')
+
+def plot_time_domain_signal(indices, samples):
+
+    plt.figure(figsize=(6, 6)) 
+
+    # Scatter plot
+    plt.scatter(indices, samples) 
+
+    # Draw vertical lines from each point to the x-axis
+    plt.vlines(indices, 0, samples, linestyles='dashed')
+
+    plt.title("Discrete Form")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+
+    plt.show()
+
+def save_time_domain_signal(file_path, samples):
+    with open(file_path[:-4] + '_Time_Domain.txt', 'w') as f:
+        f.writelines('0\n')
+        f.writelines('0\n')
+        f.writelines(str(len(samples)) + '\n')
+        for i in range(len(samples)):
+            f.write(str(i) + ' ' + str(samples[i].real) + '\n')
+
+# Custom compare functions
+
+def compare_DFT_result(your_amplitude, your_phase_shift):
+    amplitude, phase_shift, file_path = load_signal()
+    if SignalComapreAmplitude(amplitude, your_amplitude) & SignalComaprePhaseShift(phase_shift, your_phase_shift):
+        print("Success")
+        messagebox.showinfo("success", "Test case passed successfully")
+    else:
+        print("Failed")
+
+def compare_IDFT_result(your_amplitude):
+    indices, amplitude, load_file_path = load_signal()
+    if SignalComapreAmplitude(amplitude, your_amplitude):
+        print("Success")
+        messagebox.showinfo("success", "Test case passed successfully")
+    else:
+        print("Failed")
+
+# Logic functions
+
+def compute_fourier_transform(samples, isIDFT = False):
     N = len(samples)
     result = []
     for k in range(N):
         sum = 0
         for n in range(N):
-            sum += indices[n] * cmath.exp(-1j *2* cmath.pi * k * n / N)
-        result.append(sum)
-    return result, samples
+            if isIDFT:
+                sum += samples[n] * cmath.exp(1j *2* cmath.pi * k * n / N)
+            else:
+                sum += samples[n] * cmath.exp(-1j *2* cmath.pi * k * n / N)
+        if isIDFT:
+            result.append(sum/N)
+        else:
+            result.append(sum)
+    return result
 
+def compute_frequency_amplitude_phase_shift(sampling_frequency, DFT_result):
 
-def freq_domain(sample_freq, is_dft):
-    if(is_dft==True):
-        dft_result,samples = DFT()
-    amplitude = []
-    phase = []
     # Calculate amplitude and phase
-    for x in dft_result:
+    amplitude = []
+    phase_shift = []
+
+    for x in DFT_result:
         amplitude.append(math.sqrt(x.real ** 2 + x.imag ** 2))
-        phase.append(math.atan2(x.imag, x.real))
+        phase_shift.append(math.atan2(x.imag, x.real))
 
-        # Calculate the frequency for each sample
-    freq = []
-    N = len(samples)
-    first_freq = round(( 2 * cmath.pi * int(sample_freq) ) / N)
+    # Calculate the frequency for each sample
+    frequency = []
+    N = len(DFT_result)
+    fundamental_frequency = round(( 2 * cmath.pi * int(sampling_frequency) ) / N)
+
     for i in range(N):
-      freq.append(int((i+1) * first_freq))
-    print(amplitude)
-    print(freq)
-    print(phase)
+        frequency.append(int((i+1) * fundamental_frequency))
 
-        # Plot frequency vs amplitude
-    plt.figure()
-    plt.bar(freq, amplitude,width=0.2)
-    plt.title('Frequency vs Amplitude')
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Amplitude')
+    return frequency, amplitude, phase_shift
 
-        # Plot frequency vs phase
-    plt.figure()
-    plt.bar(freq, phase,width=0.2)
-    plt.title('Frequency vs Phase')
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Phase (radians)')
+def polar_to_cartesian(amplitude, phase_shift):
+    cartesian_points = []
+    for i, k in zip(amplitude, phase_shift):
+        x = i * cmath.cos(k)  # Real part
+        y = i * cmath.sin(k)  # Imaginary part
+        cartesian_point = x + (y * 1j)  # Final complex number
+        cartesian_points.append(cartesian_point)
+    return cartesian_points
 
-    plt.show()
+# Main functions that call other functions
 
-    return amplitude, phase
 
+def domain_transform(sampling_frequency, isDFT):
+    if isDFT:
+        # Input validation
+        if sampling_frequency == "":
+            messagebox.showerror("error", "please enter sampling frequency.")
+            return
+        sampling_frequency = int(sampling_frequency)
+
+        # Loading signal
+        indices, samples, file_path = load_signal()
+
+        # Applying DFT
+        DFT_result = compute_fourier_transform(samples)
+        frequency, amplitude, phase_shift = compute_frequency_amplitude_phase_shift(sampling_frequency, DFT_result)
+
+        # Printing results
+        print("frequency: ", frequency)
+        print("amplitude: ", amplitude)
+        print("phase_shift: ", phase_shift)
+
+        # Plotting and saving to file
+        plot_frequency_domain_signal(frequency, amplitude, phase_shift)
+        save_frequency_domain_signal(file_path, amplitude, phase_shift)
+        
+        # Comparing results to file
+        compare_DFT_result(amplitude, phase_shift)
+
+    else:
+        # Loading signal
+        amplitude, phase_shift, file_path = load_signal()
+
+        # Signal conversion and applying IDFT
+        cartesian_points = polar_to_cartesian(amplitude, phase_shift)
+        IDFT_result = compute_fourier_transform(cartesian_points, isIDFT= True)
+        indices = np.arange(len(IDFT_result))
+        IDFT_result = [round(x.real,2) for x in IDFT_result]
+
+        # Printing results
+        print("IDFT_result: ", IDFT_result)
+
+        # Plotting and saving to file
+        plot_time_domain_signal(indices, IDFT_result)
+        save_time_domain_signal(file_path, IDFT_result)
+
+        # Comparing results to file
+        compare_IDFT_result(IDFT_result)
 
 
 
