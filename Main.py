@@ -130,6 +130,8 @@ def open_signal_quantization_window():
     quant_win = tk.Toplevel(root)
     quant_win.title("Signal Quantization")
     quant_win.geometry("400x300")
+    quant_win.iconbitmap("Utils/Signaly.ico")
+
     
     widget_width = 20
 
@@ -173,6 +175,7 @@ def open_frequency_domain_window():
     freq_domain_win = tk.Toplevel(root)
     freq_domain_win.title("Frequency Domain")
     freq_domain_win.geometry("400x520")
+    freq_domain_win.iconbitmap("Utils/Signaly.ico")
 
     widget_width = 20
 
