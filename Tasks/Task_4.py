@@ -82,38 +82,28 @@ def plot_frequency_domain_signal(frequency, amplitude, phase_shift):
     plt.figure(figsize=(12, 6)) 
     # Subplot 1: Frequency vs amplitude
     plt.subplot(1, 2, 1)
-    plt.bar(frequency, amplitude, width = 2) 
+    plt.bar(frequency, amplitude, width = 0.5) 
 
     plt.title('Frequency vs Amplitude')
-    plt.xlabel('Frequency (Hz)')
+    plt.xlabel('Frequency')
     plt.ylabel('Amplitude')
     plt.grid(True)
 
     
     # Subplot 2: Frequency vs phase_shift
     plt.subplot(1, 2, 2)
-    plt.bar(frequency, phase_shift, color='green', width = 2)
+    plt.bar(frequency, phase_shift, color='green', width = 0.5)
 
     # Horizontal line at y=0
     plt.axhline(y=0, color='black', linewidth=1)
 
-    plt.title('Frequency vs Phase')
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Phase (radians)')
+    plt.title('Frequency vs Phase shift')
+    plt.xlabel('Frequency')
+    plt.ylabel('Phase shift (radians)')
     plt.grid(True)
 
     plt.tight_layout(pad=4.0)
     plt.show()
-
-    plt.show()
-
-def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Frequency_Domain.txt" ):
-    with open(file_path[:-4] + file_name_end, 'w') as f:
-        f.writelines('0\n')
-        f.writelines('1\n')
-        f.writelines(str(len(amplitude)) + '\n')
-        for i in range(len(amplitude)):
-            f.write(str(amplitude[i]) + ' ' + str(phase_shift[i]) + '\n')
 
 def plot_time_domain_signal(indices, samples):
 
@@ -134,6 +124,66 @@ def plot_time_domain_signal(indices, samples):
     plt.grid(True)
 
     plt.show()
+
+def plot_old_and_modified_signals(indices, amplitude_old, phase_shift_old, amplitude_new, phase_shift_new):
+    
+    plt.figure(figsize=(12, 6)) 
+    # Subplot 1: Indices vs amplitude (OLD)
+    plt.subplot(2, 2, 1)
+    plt.bar(indices, amplitude_old, width = 0.5) 
+
+    plt.title('Indices vs Amplitude [OLD]')
+    plt.xlabel('Indices')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    
+    # Subplot 2: Indices vs phase_shift (OLD)
+    plt.subplot(2, 2, 2)
+    plt.bar(indices, phase_shift_old, color='green', width = 0.5)
+
+    # Horizontal line at y=0
+    plt.axhline(y=0, color='black', linewidth=1)
+
+    plt.title('Indices vs Phase shift [OLD]')
+    plt.xlabel('Indices')
+    plt.ylabel('Phase shift (radians)')
+    plt.grid(True)
+
+    # Subplot 3: Indices vs amplitude (NEW)
+    plt.subplot(2, 2, 3)
+    plt.bar(indices, amplitude_new, width = 0.5, color = 'orange') 
+
+    plt.title('Indices vs Amplitude [NEW]')
+    plt.xlabel('Indices')
+    plt.ylabel('Amplitude')
+    plt.grid(True)
+
+    
+    # Subplot 4: Indices vs phase_shift (NEW)
+    plt.subplot(2, 2, 4)
+    plt.bar(indices, phase_shift_new, color='yellow', width = 0.5)
+
+    # Horizontal line at y=0
+    plt.axhline(y=0, color='black', linewidth=1)
+
+    plt.title('Indices vs Phase shift [NEW]')
+    plt.xlabel('Indices')
+    plt.ylabel('Phase shift (radians)')
+    plt.grid(True)
+
+
+
+    plt.tight_layout(pad=4.0)
+    plt.show()
+
+def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Frequency_Domain.txt" ):
+    with open(file_path[:-4] + file_name_end, 'w') as f:
+        f.writelines('0\n')
+        f.writelines('1\n')
+        f.writelines(str(len(amplitude)) + '\n')
+        for i in range(len(amplitude)):
+            f.write(str(amplitude[i]) + ' ' + str(phase_shift[i]) + '\n')
 
 def save_time_domain_signal(file_path, samples):
     with open(file_path[:-4] + '_Time_Domain.txt', 'w') as f:
@@ -260,11 +310,11 @@ def domain_transform(sampling_frequency, isDFT):
         compare_IDFT_result(IDFT_result)
 
 
-def modify_components(index, new_amplitude, new_phase_shift):
+def modify_components(index, new_amplitude_value, new_phase_shift_value):
 
     index = int(index)
-    new_amplitude = float(new_amplitude)
-    new_phase_shift = float(new_phase_shift)
+    new_amplitude_value = float(new_amplitude_value)
+    new_phase_shift_value = float(new_phase_shift_value)
 
     # Loading signal
     amplitude, phase_shift, file_path = load_signal()
@@ -274,19 +324,26 @@ def modify_components(index, new_amplitude, new_phase_shift):
         return
     
     # Saving old values
-    old_amplitude = amplitude[index]
-    old_phase_shift = phase_shift[index]
+    old_amplitude_value = amplitude[index]
+    old_phase_shift_value = phase_shift[index]
 
     # Changing amplitude components
-    amplitude = [new_amplitude if abs(value - old_amplitude) < 0.01 else value for value in amplitude]
+    amplitude_modified = [new_amplitude_value if abs(value - old_amplitude_value) < 0.01 else value for value in amplitude]
 
     # Changing phase shift components
+    phase_shift_modified = phase_shift.copy()
     for i in range (N):
-        if abs(abs(phase_shift[i]) - old_phase_shift) < 0.01:
-            phase_shift[i] = math.copysign(1, phase_shift[i]) * new_phase_shift
+        if abs(abs(phase_shift[i]) - old_phase_shift_value) < 0.01:
+            phase_shift_modified[i] = math.copysign(1, phase_shift[i]) * new_phase_shift_value
+            
 
     # Saving to file
-    save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Modified.txt")
+    save_frequency_domain_signal(file_path, amplitude_modified, phase_shift_modified, file_name_end = "_Modified.txt")
     messagebox.showinfo("success", "Signal modified and saved to file successfully.")
+
+    # Comparing old and new signals in a plot
+    indices = range(N)
+    plot_old_and_modified_signals(indices, amplitude, phase_shift, amplitude_modified, phase_shift_modified)
+
 
 
