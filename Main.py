@@ -21,7 +21,7 @@ def open_generate_signal_window():
     gen_win.title("Generate Signals")
     gen_win.geometry("400x360")
     gen_win.iconbitmap("Utils/Signaly.ico")
-    
+    gen_win.resizable(False, False)
 
     widget_width = 20
     
@@ -78,6 +78,7 @@ def open_signal_operations_window():
     op_win.title("Signal Operations")
     op_win.geometry("400x360")
     op_win.iconbitmap("Utils/Signaly.ico")
+    op_win.resizable(False, False)
 
 
     widget_width = 20
@@ -132,6 +133,7 @@ def open_signal_quantization_window():
     quant_win.title("Signal Quantization")
     quant_win.geometry("400x300")
     quant_win.iconbitmap("Utils/Signaly.ico")
+    quant_win.resizable(False, False)
 
     
     widget_width = 20
@@ -177,6 +179,7 @@ def open_frequency_domain_window():
     freq_domain_win.title("Frequency Domain")
     freq_domain_win.geometry("400x700")
     freq_domain_win.iconbitmap("Utils/Signaly.ico")
+    freq_domain_win.resizable(False, False)
 
     widget_width = 20
 

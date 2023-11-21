@@ -333,7 +333,7 @@ def domain_transform(sampling_frequency, transformation_method):
 
         # Plotting and saving to file
         plot_time_domain_signal(indices, DCT_result)
-        save_time_domain_signal(file_path, DCT_result, '_Frequency_Domain_DCT')
+        save_time_domain_signal(file_path, DCT_result,  '_Frequency_Domain_DCT.txt')
 
         # Comparing results to file
         compare_IDFT_result(DCT_result)
@@ -387,7 +387,7 @@ def remove_dc_component():
 
     # Plotting and saving to file
     plot_time_domain_signal(indices, result)
-    save_time_domain_signal(file_path, result , '_DC_component_removed')
+    save_time_domain_signal(file_path, result , '_DC_component_removed.txt')
 
     # Comparing results to file
     compare_IDFT_result(result)
