@@ -2,9 +2,7 @@ import cmath
 from tkinter import filedialog
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import make_interp_spline
 from tkinter import messagebox
-import random
 import math
 
 
@@ -177,7 +175,7 @@ def plot_old_and_modified_signals(indices, amplitude_old, phase_shift_old, ampli
     plt.tight_layout(pad=4.0)
     plt.show()
 
-def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Frequency_Domain.txt" ):
+def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_end = "_Frequency_Domain_DFT.txt" ):
     with open(file_path[:-4] + file_name_end, 'w') as f:
         f.writelines('0\n')
         f.writelines('1\n')
@@ -185,8 +183,8 @@ def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_en
         for i in range(len(amplitude)):
             f.write(str(amplitude[i]) + ' ' + str(phase_shift[i]) + '\n')
 
-def save_time_domain_signal(file_path, samples):
-    with open(file_path[:-4] + '_Time_Domain.txt', 'w') as f:
+def save_time_domain_signal(file_path, samples, file_name_end = "_Time_Domain_IDFT.txt"):
+    with open(file_path[:-4] + file_name_end, 'w') as f:
         f.writelines('0\n')
         f.writelines('0\n')
         f.writelines(str(len(samples)) + '\n')
@@ -213,7 +211,7 @@ def compare_IDFT_result(your_amplitude):
 
 # Logic functions
 
-def compute_fourier_transform(samples, isIDFT = False):
+def compute_discrete_fourier_transform(samples, isIDFT = False):
     N = len(samples)
     result = []
     for k in range(N):
@@ -258,12 +256,25 @@ def polar_to_cartesian(amplitude, phase_shift):
         cartesian_points.append(cartesian_point)
     return cartesian_points
 
+def compute_discrete_cosine_transform(samples):
+    N = len(samples)
+    result = []
+    for k in range(N):
+        sum = 0
+        for n in range(N):
+            sum += samples[n] * math.cos( (math.pi/(4*N)) * (2*n-1) * (2*k-1) )
+        result.append(math.sqrt(2/N) * sum)
+    return result
 
+def remove_dc_component_time_domain(samples):
+    result = samples - np.mean(samples)
+    return result
 # Main functions that call other functions
 
 
-def domain_transform(sampling_frequency, isDFT):
-    if isDFT:
+def domain_transform(sampling_frequency, transformation_method):
+    # DFT
+    if transformation_method == 0:
         # Input validation
         if sampling_frequency == "":
             messagebox.showerror("error", "please enter sampling frequency.")
@@ -274,7 +285,7 @@ def domain_transform(sampling_frequency, isDFT):
         indices, samples, file_path = load_signal()
 
         # Applying DFT
-        DFT_result = compute_fourier_transform(samples)
+        DFT_result = compute_discrete_fourier_transform(samples)
         frequency, amplitude, phase_shift = compute_frequency_amplitude_phase_shift(sampling_frequency, DFT_result)
 
         # Printing results
@@ -289,18 +300,19 @@ def domain_transform(sampling_frequency, isDFT):
         # Comparing results to file
         compare_DFT_result(amplitude, phase_shift)
 
-    else:
+    # IDFT
+    elif transformation_method == 1:
         # Loading signal
         amplitude, phase_shift, file_path = load_signal()
 
         # Signal conversion and applying IDFT
         cartesian_points = polar_to_cartesian(amplitude, phase_shift)
-        IDFT_result = compute_fourier_transform(cartesian_points, isIDFT= True)
+        IDFT_result = compute_discrete_fourier_transform(cartesian_points, isIDFT= True)
         indices = np.arange(len(IDFT_result))
         IDFT_result = [round(x.real,2) for x in IDFT_result]
 
         # Printing results
-        print("IDFT_result: ", IDFT_result)
+        print("IDFT result: ", IDFT_result)
 
         # Plotting and saving to file
         plot_time_domain_signal(indices, IDFT_result)
@@ -308,6 +320,23 @@ def domain_transform(sampling_frequency, isDFT):
 
         # Comparing results to file
         compare_IDFT_result(IDFT_result)
+    # DCT
+    else:
+        # Loading signal
+        indices, samples, file_path = load_signal()
+
+        # Applying DCT
+        DCT_result = compute_discrete_cosine_transform(samples)
+
+        # Printing results
+        print("DCT result: ", DCT_result)
+
+        # Plotting and saving to file
+        plot_time_domain_signal(indices, DCT_result)
+        save_time_domain_signal(file_path, DCT_result, '_Frequency_Domain_DCT')
+
+        # Comparing results to file
+        compare_IDFT_result(DCT_result)
 
 
 def modify_components(index, new_amplitude_value, new_phase_shift_value):
@@ -346,4 +375,20 @@ def modify_components(index, new_amplitude_value, new_phase_shift_value):
     plot_old_and_modified_signals(indices, amplitude, phase_shift, amplitude_modified, phase_shift_modified)
 
 
+def remove_dc_component():
+    # Loading signal
+    indices, samples, file_path = load_signal()
+    
+    # If time domain, remove DC component by subtract mean value
+    result = remove_dc_component_time_domain(samples)
+
+    # Print results
+    print("Signal after removing DC component: ", result)
+
+    # Plotting and saving to file
+    plot_time_domain_signal(indices, result)
+    save_time_domain_signal(file_path, result , '_DC_component_removed')
+
+    # Comparing results to file
+    compare_IDFT_result(result)
 
