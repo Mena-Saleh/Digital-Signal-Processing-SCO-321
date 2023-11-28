@@ -4,6 +4,7 @@ from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
 from Tasks import Task_3 as tsk3
 from Tasks import Task_4_5 as tsk4_5
+from Tasks import Task_6 as tsk6
 
 
 # Styling functions
@@ -260,7 +261,32 @@ def open_frequency_domain_window():
     remove_dc_component_button.bind("<Enter>", on_enter)
     remove_dc_component_button.bind("<Leave>", on_leave)
 
+def open_signal_smoothing_window():
+    quant_win = tk.Toplevel(root)
+    quant_win.title("Signal Quantization")
+    quant_win.geometry("400x300")
+    quant_win.iconbitmap("Utils/Signaly.ico")
+    quant_win.resizable(False, False)
 
+    widget_width = 20
+
+    input_label = tk.Label(quant_win, text="window size:")
+    input_label.grid(row=0, column=0, padx=30, pady=20, sticky="w")
+    input_textbox = tk.Entry(quant_win, width=widget_width)
+    input_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="w")
+
+    btn_smooth = tk.Button(quant_win, text="Smooth Signal", bg=colors["blue"], fg=colors["white"], width=15,
+                             height=2, relief="flat", bd=0)
+    btn_smooth.grid(row=4, column=1, columnspan=2, pady=20, padx=30)
+
+
+    # Button functions
+    btn_smooth.config(command=lambda: tsk6.smooth_signal(input_textbox.get()))
+
+
+    # Hover effects
+    btn_smooth.bind("<Enter>", on_enter)
+    btn_smooth.bind("<Leave>", on_leave)
 
 # Color palette
 colors = {
@@ -300,6 +326,9 @@ btn_signal_quantization.pack(pady=10, padx=10)
 btn_frequency_domain = tk.Button(nav_frame, text="Frequency \nDomain", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_frequency_domain.pack(pady=10, padx=10)
 
+btn_smooth_signal = tk.Button(nav_frame, text="Signal Smoothing", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+btn_smooth_signal.pack(pady=10, padx=10)
+
 
 # Hover effects
 btn_browse.bind("<Enter>", on_enter)
@@ -317,6 +346,8 @@ btn_signal_quantization.bind("<Leave>", on_leave)
 btn_frequency_domain.bind("<Enter>", on_enter)
 btn_frequency_domain.bind("<Leave>", on_leave)
 
+btn_smooth_signal.bind("<Enter>", on_enter)
+btn_smooth_signal.bind("<Leave>", on_leave)
 # Buttons functions
 
 btn_browse.config(command = tsk1.browse_signal)
@@ -324,6 +355,9 @@ btn_generate.config(command=open_generate_signal_window)
 btn_signal_operations.config(command=open_signal_operations_window)
 btn_signal_quantization.config(command=open_signal_quantization_window)
 btn_frequency_domain.config(command=open_frequency_domain_window)
+btn_smooth_signal.config(command=open_signal_smoothing_window)
+
+
 
 
 
