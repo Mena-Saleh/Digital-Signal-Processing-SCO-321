@@ -265,32 +265,59 @@ def open_frequency_domain_window():
     remove_dc_component_button.bind("<Enter>", on_enter)
     remove_dc_component_button.bind("<Leave>", on_leave)
 
-def open_signal_smoothing_window():
-    quant_win = tk.Toplevel(root)
-    quant_win.title("Signal Quantization")
-    quant_win.geometry("400x300")
-    quant_win.iconbitmap("Utils/Signaly.ico")
-    quant_win.resizable(False, False)
+def open_filters_and_shifting_window():
+    filters_and_shifting_win = tk.Toplevel(root)
+    filters_and_shifting_win.title("Filters & Shifting")
+    filters_and_shifting_win.geometry("400x320")
+    filters_and_shifting_win.iconbitmap("Utils/Signaly.ico")
+    filters_and_shifting_win.resizable(False, False)
+
 
     widget_width = 20
 
-    input_label = tk.Label(quant_win, text="window size:")
-    input_label.grid(row=0, column=0, padx=30, pady=20, sticky="w")
-    input_textbox = tk.Entry(quant_win, width=widget_width)
-    input_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="w")
+    # Label for selecting operation
+    operations_label = tk.Label(filters_and_shifting_win, text="Select an Operation:")
+    operations_label.grid(row=0, column=0, padx=30, pady=(50,10), sticky="w")
+    
+    # Combobox for operations
+    cmb_operations = ttk.Combobox(filters_and_shifting_win, values=["Delaying", "Advancing", "Smoothing", "Sharpening", 
+                                                 "Folding"], width=widget_width-3)
+    cmb_operations.grid(row=0, column=1, padx=30, pady=(50,10))
 
-    btn_smooth = tk.Button(quant_win, text="Smooth Signal", bg=colors["blue"], fg=colors["white"], width=15,
-                             height=2, relief="flat", bd=0)
-    btn_smooth.grid(row=4, column=1, columnspan=2, pady=20, padx=30)
+    # Only show the option to fold when using delaying or advancing operations
+    def handle_combobox_selection(event):
+        selected_option = cmb_operations.get()
+        if selected_option == "Delaying" or selected_option == "Advancing":
+            is_folding_check.config(state=tk.NORMAL)
+        else:
+            is_folding_check.config(state=tk.DISABLED)
+
+    cmb_operations.bind("<<ComboboxSelected>>", handle_combobox_selection)
+
+    # Label and Entry for user input
+    input_label = tk.Label(filters_and_shifting_win, text="Input (Window size or steps):")
+    input_label.grid(row=2, column=0, padx=30, pady=10, sticky="w")
+    txt_input = tk.Entry(filters_and_shifting_win, width=widget_width)
+    txt_input.grid(row=2, column=1, padx=30, pady=10)
+
+    # Check box for folding
+    is_folding_var = tk.BooleanVar(value=False)
+    is_folding_check = tk.Checkbutton(filters_and_shifting_win, text="Fold Signal", variable=is_folding_var, state=tk.DISABLED)
+    is_folding_check.grid(row=3, column=0, pady=20, padx=30, sticky='w')
+
+    # Buttons
+    btn_operate = tk.Button(filters_and_shifting_win, text="Do Operation", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+    btn_operate.grid(row=4, column=0, padx=(50,30), pady=(40,20), sticky="e")
 
 
     # Button functions
-    btn_smooth.config(command=lambda: tsk6.smooth_signal(input_textbox.get()))
-
+    btn_operate.config(command=lambda: tsk6.do_operation(cmb_operations.get(), txt_input.get(), is_folding_var.get()))
 
     # Hover effects
-    btn_smooth.bind("<Enter>", on_enter)
-    btn_smooth.bind("<Leave>", on_leave)
+    btn_operate.bind("<Enter>", on_enter)
+    btn_operate.bind("<Leave>", on_leave)
+
+
 
 # Color palette
 colors = {
@@ -330,8 +357,8 @@ btn_signal_quantization.pack(pady=10, padx=10)
 btn_frequency_domain = tk.Button(nav_frame, text="Frequency \nDomain", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_frequency_domain.pack(pady=10, padx=10)
 
-btn_smooth_signal = tk.Button(nav_frame, text="Signal Smoothing", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
-btn_smooth_signal.pack(pady=10, padx=10)
+btn_filters_and_shifting = tk.Button(nav_frame, text="Filters & Shifting", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
+btn_filters_and_shifting.pack(pady=10, padx=10)
 
 
 # Hover effects
@@ -350,8 +377,9 @@ btn_signal_quantization.bind("<Leave>", on_leave)
 btn_frequency_domain.bind("<Enter>", on_enter)
 btn_frequency_domain.bind("<Leave>", on_leave)
 
-btn_smooth_signal.bind("<Enter>", on_enter)
-btn_smooth_signal.bind("<Leave>", on_leave)
+btn_filters_and_shifting.bind("<Enter>", on_enter)
+btn_filters_and_shifting.bind("<Leave>", on_leave)
+
 # Buttons functions
 
 btn_browse.config(command = tsk1.browse_signal)
@@ -359,7 +387,7 @@ btn_generate.config(command=open_generate_signal_window)
 btn_signal_operations.config(command=open_signal_operations_window)
 btn_signal_quantization.config(command=open_signal_quantization_window)
 btn_frequency_domain.config(command=open_frequency_domain_window)
-btn_smooth_signal.config(command=open_signal_smoothing_window)
+btn_filters_and_shifting.config(command=open_filters_and_shifting_window)
 
 
 
