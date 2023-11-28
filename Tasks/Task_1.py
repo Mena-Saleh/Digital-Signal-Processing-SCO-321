@@ -146,7 +146,6 @@ def compute_signal(amplitude, wave_type, analogue_frequency, sampling_frequency,
     else:
         samples = amplitude * np.cos(2 * np.pi * normalized_frequency * indices + phase_shift)
     
-
     return samples_time, indices, samples
 
 def generate_signal(amplitude, wave_type, analogue_frequency, sampling_frequency, phase_shift):

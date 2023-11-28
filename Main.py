@@ -242,6 +242,10 @@ def open_frequency_domain_window():
     remove_dc_component_label = tk.Label(freq_domain_win, text="Removing DC component (Time domain and frequency domain):")
     remove_dc_component_label.grid(row=10, column=0, columnspan=2, padx=30, pady=20, sticky="w")
 
+    is_frequency_domain_var = tk.BooleanVar(value=False)
+    is_frequency_domain_check = tk.Checkbutton(freq_domain_win, text="In frequency domain", variable=is_frequency_domain_var)
+    is_frequency_domain_check.grid(row=11, column=0, pady=20, padx=0)
+
     remove_dc_component_button = tk.Button(freq_domain_win, text="Remove", bg=colors["blue"], fg=colors["white"], width=15,
                              height=2, relief="flat", bd=0)
     remove_dc_component_button.grid(row=11, column=0, columnspan=2, pady=20, padx=60, sticky='e')
@@ -249,7 +253,7 @@ def open_frequency_domain_window():
     # Button functions
     btn_transform_dft_idft.config(command=lambda: tsk4_5.domain_transform(input_textbox.get(), radio_var.get()))
     modify_button.config(command=lambda: tsk4_5.modify_components(component_index_textbox.get(), amplitude_textbox.get(), phase_shift_textbox.get()))
-    remove_dc_component_button.config(command=lambda: tsk4_5.remove_dc_component())
+    remove_dc_component_button.config(command=lambda: tsk4_5.remove_dc_component(is_frequency_domain_var.get()))
 
     # Hover effects
     btn_transform_dft_idft.bind("<Enter>", on_enter)

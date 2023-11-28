@@ -41,6 +41,7 @@ def load_signal():
     return indices, samples, file_path
 
 def plot_smoothed_signal(indices,samples,smoothed_indices,smoothed_samples,window_size):
+
     plt.figure(figsize=(8, 5))
     plt.subplot(2, 1, 1)
     plt.plot(indices, samples, label='Original Signal')
@@ -61,12 +62,14 @@ def plot_smoothed_signal(indices,samples,smoothed_indices,smoothed_samples,windo
     # Show the plots
     plt.show()
 
+
+# Needs 0 padding at the end
 def smooth_signal(window_size):
     window_size= int(window_size)
-    indices, samples, load_file_path = load_signal()
-    smoothed_samples=[]
-    smoothe_signal_len=len(samples) - window_size + 1
-    for i in range(smoothe_signal_len):
+    indices, samples, file_path = load_signal()
+    smoothed_samples= []
+    smoothed_signal_len= len(samples) - window_size + 1
+    for i in range(smoothed_signal_len):
         window = samples[i:i + window_size]
         avg = sum(window) / window_size
         smoothed_samples.append(avg)
@@ -74,7 +77,7 @@ def smooth_signal(window_size):
     for i in range(len(smoothed_samples)):
         smoothed_indices.append(indices[i])
 
-    #ploting
+    # Ploting
     plot_smoothed_signal(indices,samples,smoothed_indices,smoothed_samples,window_size)
 
 

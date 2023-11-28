@@ -273,6 +273,17 @@ def compute_discrete_cosine_transform(samples):
 def remove_dc_component_time_domain(samples):
     result = samples - np.mean(samples)
     return result
+
+def remove_dc_component_frequency_domain(samples):
+    # Applying DFT
+    DFT_result = compute_discrete_fourier_transform(samples)
+    # Removing DC
+    DFT_result[0] = 0
+    # Applying IDFT
+    IDFT_result = compute_discrete_fourier_transform(DFT_result, isIDFT= True)
+    IDFT_result = [round(x.real,2) for x in IDFT_result]
+    return IDFT_result
+
 # Main functions that call other functions
 
 
@@ -385,12 +396,16 @@ def modify_components(index, new_amplitude_value, new_phase_shift_value):
     plot_old_and_modified_signals(indices, amplitude, phase_shift, amplitude_modified, phase_shift_modified)
 
 
-def remove_dc_component():
+def remove_dc_component(is_frequency_domain):
+
     # Loading signal
     indices, samples, file_path = load_signal()
     
-    # If time domain, remove DC component by subtract mean value
-    result = remove_dc_component_time_domain(samples)
+    # Remove DC component
+    if(is_frequency_domain):
+        result = remove_dc_component_frequency_domain(samples)
+    else:
+        result = remove_dc_component_time_domain(samples)
 
     # Print results
     print("Signal after removing DC component: ", result)
