@@ -183,13 +183,17 @@ def save_frequency_domain_signal(file_path, amplitude, phase_shift, file_name_en
         for i in range(len(amplitude)):
             f.write(str(amplitude[i]) + ' ' + str(phase_shift[i]) + '\n')
 
-def save_time_domain_signal(file_path, samples, file_name_end = "_Time_Domain_IDFT.txt"):
+def save_time_domain_signal(file_path, samples, file_name_end = "_Time_Domain_IDFT.txt", m = -1):
     with open(file_path[:-4] + file_name_end, 'w') as f:
         f.writelines('0\n')
         f.writelines('0\n')
         f.writelines(str(len(samples)) + '\n')
-        for i in range(len(samples)):
-            f.write(str(i) + ' ' + str(samples[i].real) + '\n')
+        if m == -1:
+            for i in range(len(samples)):
+                f.write(str(i) + ' ' + str(samples[i].real) + '\n')
+        else:
+            for i in range(m):
+                f.write(str(i) + ' ' + str(samples[i].real) + '\n')
 
 # Custom compare functions
 
@@ -272,21 +276,24 @@ def remove_dc_component_time_domain(samples):
 # Main functions that call other functions
 
 
-def domain_transform(sampling_frequency, transformation_method):
+def domain_transform(user_input, transformation_method, ):
+
+    if(user_input):
+        user_input = int(user_input)
+
     # DFT
     if transformation_method == 0:
         # Input validation
-        if sampling_frequency == "":
+        if user_input == "":
             messagebox.showerror("error", "please enter sampling frequency.")
             return
-        sampling_frequency = int(sampling_frequency)
 
         # Loading signal
         indices, samples, file_path = load_signal()
 
         # Applying DFT
         DFT_result = compute_discrete_fourier_transform(samples)
-        frequency, amplitude, phase_shift = compute_frequency_amplitude_phase_shift(sampling_frequency, DFT_result)
+        frequency, amplitude, phase_shift = compute_frequency_amplitude_phase_shift(user_input, DFT_result)
 
         # Printing results
         print("frequency: ", frequency)
@@ -322,6 +329,9 @@ def domain_transform(sampling_frequency, transformation_method):
         compare_IDFT_result(IDFT_result)
     # DCT
     else:
+        if user_input == "":
+            messagebox.showerror("error", "please enter sampling frequency.")
+            return
         # Loading signal
         indices, samples, file_path = load_signal()
 
@@ -333,7 +343,7 @@ def domain_transform(sampling_frequency, transformation_method):
 
         # Plotting and saving to file
         plot_time_domain_signal(indices, DCT_result)
-        save_time_domain_signal(file_path, DCT_result,  '_Frequency_Domain_DCT.txt')
+        save_time_domain_signal(file_path, DCT_result,  '_Frequency_Domain_DCT.txt', m = user_input)
 
         # Comparing results to file
         compare_IDFT_result(DCT_result)

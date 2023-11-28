@@ -187,7 +187,7 @@ def open_frequency_domain_window():
 
     # DFT, IDFT and DCT section
 
-    input_label = tk.Label(freq_domain_win, text="Sampling frequency:")
+    input_label = tk.Label(freq_domain_win, text="Freq/No of coff")
     input_label.grid(row=0, column=0, padx=30, pady=20, sticky="w")
 
     input_textbox = tk.Entry(freq_domain_win, width=widget_width)
