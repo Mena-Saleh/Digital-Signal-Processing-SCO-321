@@ -246,22 +246,27 @@ def convolve_signals(indices1, samples1, indices2, samples2):
     result_max_index = max(indices1) + max(indices2)
     result_indices = list(range(result_min_index, result_max_index + 1))
 
-   # Initialize an array to hold the samples of the convolved signal
-    result_samples = [0] * len(result_indices)
-    
-    # Perform the convolution operation
-    for n in range(len(result_indices)):
-        # Calculate the convolution sum at each point n
-        for k in range(len(samples1)):
-            # Compute the index for the second signal
-            h_index = result_indices[n] - indices1[k]
-            # Check if this index is within the bounds of the second signal
-            if h_index in indices2:
-                # Find the index in the samples2 list
-                h_sample_index = indices2.index(h_index)
-                # Update the convolution sum
-                result_samples[n] += samples1[k] * samples2[h_sample_index]
-    
+    # Initialize an array to hold the samples of the convolved signal
+    result_samples = []
+
+    # Initialize an array to hold the samples of the convolved signal
+    result_samples = []
+
+    # Iterate through each index in the result indices
+    for i in result_indices:
+        # Initialize the sum for this index
+        sum_samples = 0
+        # Go through each index in the first signal
+        for j in indices1:
+            # Calculate the corresponding index in the second signal
+            k = i - j
+            # If k is in the range of indices2, multiply the samples and add to the sum
+            if k in indices2:
+                sum_samples += samples1[indices1.index(j)] * samples2[indices2.index(k)]
+
+        # Append the calculated sum to the result samples
+        result_samples.append(sum_samples)
+
     return result_indices, result_samples
 
 # Main function
@@ -291,5 +296,4 @@ def do_operation(operation, user_input, is_fold= False):
         indices2, samples2, file_path = load_signal()
         result_indices, result_samples = convolve_signals(indices, samples, indices2, samples2)
         ConvTest(result_indices, result_samples)
-
 
