@@ -4,7 +4,7 @@ from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
 from Tasks import Task_3 as tsk3
 from Tasks import Task_4_5 as tsk4_5
-from Tasks import Task_6 as tsk6
+from Tasks import Task_6_7 as tsk6_7
 
 
 # Styling functions
@@ -281,7 +281,7 @@ def open_filters_and_shifting_window():
     
     # Combobox for operations
     cmb_operations = ttk.Combobox(filters_and_shifting_win, values=["Delaying", "Advancing", "Smoothing", "Sharpening", 
-                                                 "Folding"], width=widget_width-3)
+                                                 "Folding", "convolution"], width=widget_width-3)
     cmb_operations.grid(row=0, column=1, padx=30, pady=(50,10))
 
     # Only show the option to fold when using delaying or advancing operations
@@ -311,7 +311,7 @@ def open_filters_and_shifting_window():
 
 
     # Button functions
-    btn_operate.config(command=lambda: tsk6.do_operation(cmb_operations.get(), txt_input.get(), is_folding_var.get()))
+    btn_operate.config(command=lambda: tsk6_7.do_operation(cmb_operations.get(), txt_input.get(), is_folding_var.get()))
 
     # Hover effects
     btn_operate.bind("<Enter>", on_enter)

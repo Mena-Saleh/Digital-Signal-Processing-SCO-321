@@ -50,6 +50,73 @@ def signal_samples_are_equal(file_name,indices,samples, isShiftOp = False):
     print("Test case passed successfully")
     messagebox.showinfo("Test case succeeded", "Test case passed successfully")
 
+def Shift_Fold_Signal(file_name,Your_indices,Your_samples):      
+    expected_indices=[]
+    expected_samples=[]
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
+            else:
+                break
+    print("Current Output Test file is: ")
+    print(file_name)
+    print("\n")
+    if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
+        print("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(Your_indices)):
+        if(Your_indices[i]!=expected_indices[i]):
+            print("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one") 
+            return
+    for i in range(len(expected_samples)):
+        if abs(Your_samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print("Shift_Fold_Signal Test case failed, your signal have different values from the expected one") 
+            return
+    print("Shift_Fold_Signal Test case passed successfully")
+
+def ConvTest(Your_indices,Your_samples): 
+    """
+    Test inputs
+    InputIndicesSignal1 =[-2, -1, 0, 1]
+    InputSamplesSignal1 = [1, 2, 1, 1 ]
+    
+    InputIndicesSignal2=[0, 1, 2, 3, 4, 5 ]
+    InputSamplesSignal2 = [ 1, -1, 0, 0, 1, 1 ]
+    """
+    
+    expected_indices=[-2, -1, 0, 1, 2, 3, 4, 5, 6]
+    expected_samples = [1, 1, -1, 0, 0, 3, 3, 2, 1 ]
+
+    
+    if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
+        print("Conv Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(Your_indices)):
+        if(Your_indices[i]!=expected_indices[i]):
+            print("Conv Test case failed, your signal have different indicies from the expected one") 
+            return
+    for i in range(len(expected_samples)):
+        if abs(Your_samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print("Conv Test case failed, your signal have different values from the expected one") 
+            return
+    print("Conv Test case passed successfully")
+
 # Helper functions
 
 def load_file_path():
@@ -112,6 +179,7 @@ def plot_two_signals(indices1,samples1,indices2,samples2, label1, label2):
 
 
 # Logic functions
+
 def smoothen_signal(window_size, indices, samples):
 
     window_size= int(window_size)
@@ -163,17 +231,38 @@ def fold_signal(indices, samples):
     file_path = load_file_path()
     signal_samples_are_equal(file_path, indices, folded)
 
-
 def shift_signal(indices, samples, const):
     shifted = [index - float(const) for index in indices]
-    print(shifted)
     # Plotting
     plot_two_signals(indices,samples,shifted, samples, "Original Sample", "Shifted Sample")
 
     # Comparing to output (Twice, once for each derivative)
     file_path = load_file_path()
-    signal_samples_are_equal(file_path, shifted, samples, isShiftOp=True)
+    Shift_Fold_Signal(file_path, shifted, samples)
 
+def convolve_signals(indices1, samples1, indices2, samples2):
+    # Get the range of indices and populate a list of indices for the resulting signal
+    result_min_index = min(indices1) + min(indices2)
+    result_max_index = max(indices1) + max(indices2)
+    result_indices = list(range(result_min_index, result_max_index + 1))
+
+   # Initialize an array to hold the samples of the convolved signal
+    result_samples = [0] * len(result_indices)
+    
+    # Perform the convolution operation
+    for n in range(len(result_indices)):
+        # Calculate the convolution sum at each point n
+        for k in range(len(samples1)):
+            # Compute the index for the second signal
+            h_index = result_indices[n] - indices1[k]
+            # Check if this index is within the bounds of the second signal
+            if h_index in indices2:
+                # Find the index in the samples2 list
+                h_sample_index = indices2.index(h_index)
+                # Update the convolution sum
+                result_samples[n] += samples1[k] * samples2[h_sample_index]
+    
+    return result_indices, result_samples
 
 # Main function
 
@@ -198,8 +287,9 @@ def do_operation(operation, user_input, is_fold= False):
         if is_fold:
             samples = samples[::-1]
         shift_signal(indices, samples, float(user_input))
+    elif operation == "convolution":
+        indices2, samples2, file_path = load_signal()
+        result_indices, result_samples = convolve_signals(indices, samples, indices2, samples2)
+        ConvTest(result_indices, result_samples)
 
-
-
-    
 
