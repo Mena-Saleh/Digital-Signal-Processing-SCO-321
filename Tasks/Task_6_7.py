@@ -249,9 +249,6 @@ def convolve_signals(indices1, samples1, indices2, samples2):
     # Initialize an array to hold the samples of the convolved signal
     result_samples = []
 
-    # Initialize an array to hold the samples of the convolved signal
-    result_samples = []
-
     # Iterate through each index in the result indices
     for i in result_indices:
         # Initialize the sum for this index
@@ -267,6 +264,8 @@ def convolve_signals(indices1, samples1, indices2, samples2):
         # Append the calculated sum to the result samples
         result_samples.append(sum_samples)
 
+    print("Indices: ", result_indices)
+    print("Samples: ", result_samples)
     return result_indices, result_samples
 
 # Main function
@@ -292,7 +291,7 @@ def do_operation(operation, user_input, is_fold= False):
         if is_fold:
             samples = samples[::-1]
         shift_signal(indices, samples, float(user_input))
-    elif operation == "convolution":
+    elif operation == "Convolution":
         indices2, samples2, file_path = load_signal()
         result_indices, result_samples = convolve_signals(indices, samples, indices2, samples2)
         ConvTest(result_indices, result_samples)

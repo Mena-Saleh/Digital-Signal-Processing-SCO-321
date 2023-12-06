@@ -281,7 +281,7 @@ def open_filters_and_shifting_window():
     
     # Combobox for operations
     cmb_operations = ttk.Combobox(filters_and_shifting_win, values=["Delaying", "Advancing", "Smoothing", "Sharpening", 
-                                                 "Folding", "convolution"], width=widget_width-3)
+                                                 "Folding", "Convolution"], width=widget_width-3)
     cmb_operations.grid(row=0, column=1, padx=30, pady=(50,10))
 
     # Only show the option to fold when using delaying or advancing operations
