@@ -3,7 +3,7 @@ from tkinter import filedialog
 import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import messagebox
-
+import math
 
 # Evaluation function (given):
 
@@ -117,6 +117,44 @@ def ConvTest(Your_indices,Your_samples):
             return
     print("Conv Test case passed successfully")
 
+def CorrTest(file_name,Your_indices,Your_samples):      
+    expected_indices=[]
+    expected_samples=[]
+    with open(file_name, 'r') as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        while line:
+            # process line
+            L=line.strip()
+            if len(L.split(' '))==2:
+                L=line.split(' ')
+                V1=int(L[0])
+                V2=float(L[1])
+                expected_indices.append(V1)
+                expected_samples.append(V2)
+                line = f.readline()
+            else:
+                break
+    print("Current Output Test file is: ")
+    print(file_name)
+    print("\n")
+    if (len(expected_samples)!=len(Your_samples)) and (len(expected_indices)!=len(Your_indices)):
+        print("Shift_Fold_Signal Test case failed, your signal have different length from the expected one")
+        return
+    for i in range(len(Your_indices)):
+        if(Your_indices[i]!=expected_indices[i]):
+            print("Shift_Fold_Signal Test case failed, your signal have different indicies from the expected one") 
+            return
+    for i in range(len(expected_samples)):
+        if abs(Your_samples[i] - expected_samples[i]) < 0.01:
+            continue
+        else:
+            print("Correlation Test case failed, your signal have different values from the expected one") 
+            return
+    print("Correlation Test case passed successfully")
+
 # Helper functions
 
 def load_file_path():
@@ -227,7 +265,7 @@ def fold_signal(indices, samples):
     # Plotting
     plot_two_signals(indices,samples,indices,folded, "Original Sample", "Folded Sample")
 
-    # Comparing to output (Twice, once for each derivative)
+    # Comparing to output
     file_path = load_file_path()
     signal_samples_are_equal(file_path, indices, folded)
 
@@ -236,7 +274,7 @@ def shift_signal(indices, samples, const):
     # Plotting
     plot_two_signals(indices,samples,shifted, samples, "Original Sample", "Shifted Sample")
 
-    # Comparing to output (Twice, once for each derivative)
+    # Comparing to output
     file_path = load_file_path()
     Shift_Fold_Signal(file_path, shifted, samples)
 
@@ -249,7 +287,7 @@ def convolve_signals(indices1, samples1, indices2, samples2):
     # Initialize an array to hold the samples of the convolved signal
     result_samples = []
 
-    # Iterate through each index in the result indices
+    # Go through each index in the result indices
     for i in result_indices:
         # Initialize the sum for this index
         sum_samples = 0
@@ -258,14 +296,39 @@ def convolve_signals(indices1, samples1, indices2, samples2):
             # Calculate the corresponding index in the second signal
             k = i - j
             # If k is in the range of indices2, multiply the samples and add to the sum
+            # If it is not in range that means its 0 so the sum is 0, so nothing needs to be done.
             if k in indices2:
                 sum_samples += samples1[indices1.index(j)] * samples2[indices2.index(k)]
 
         # Append the calculated sum to the result samples
         result_samples.append(sum_samples)
+        
+    # Print results
+    print("Result indices: ", result_indices)
+    print("Result samples: ", result_samples)
+    return result_indices, result_samples
 
-    print("Indices: ", result_indices)
-    print("Samples: ", result_samples)
+def correlate_signals(indices1, samples1, indices2, samples2:list):
+    # Initializing indices and populating
+    n = len(indices1)
+    result_indices =list(range(n)) 
+    
+    # Calculate denominator once
+    denumerator = 1/n * math.sqrt((sum([i**2 for i in samples1]) * sum([i**2 for i in samples2])))
+    # Initializing samples list.
+    result_samples = []
+    for i in range (n):
+        # First iteration there is no shifting, just multiply
+        curr_result = sum(s1*s2 for s1,s2 in zip(samples1,samples2))
+        numerator = curr_result/n
+        result_samples.append(numerator/denumerator)
+        # Pop first element in second signal and add it to the end (lag by 1).
+        current_element = samples2[0]
+        samples2.pop(0)
+        samples2.append(current_element)
+        
+    print("Result signal: ", result_samples)
+    
     return result_indices, result_samples
 
 # Main function
@@ -295,4 +358,9 @@ def do_operation(operation, user_input, is_fold= False):
         indices2, samples2, file_path = load_signal()
         result_indices, result_samples = convolve_signals(indices, samples, indices2, samples2)
         ConvTest(result_indices, result_samples)
+    elif operation == "Correlation":
+        indices2, samples2, file_path = load_signal()
+        result_indices, result_samples = correlate_signals(indices, samples, indices2, samples2)
+        file_path = load_file_path()
+        CorrTest(file_path, result_indices, result_samples)
 
