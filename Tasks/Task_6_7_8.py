@@ -313,7 +313,7 @@ def correlate_signals(indices1, samples1, indices2, samples2:list):
     n = len(indices1)
     result_indices =list(range(n)) 
     
-    # Calculate denominator once
+    # Calculate denumerator once
     denumerator = 1/n * math.sqrt((sum([i**2 for i in samples1]) * sum([i**2 for i in samples2])))
     # Initializing samples list.
     result_samples = []
@@ -323,9 +323,9 @@ def correlate_signals(indices1, samples1, indices2, samples2:list):
         numerator = curr_result/n
         result_samples.append(numerator/denumerator)
         # Pop first element in second signal and add it to the end (lag by 1).
-        current_element = samples2[0]
+        first_element = samples2[0]
         samples2.pop(0)
-        samples2.append(current_element)
+        samples2.append(first_element)
         
     print("Result signal: ", result_samples)
     
