@@ -282,6 +282,7 @@ def convolve_signals(indices1, samples1, indices2, samples2):
     # Get the range of indices and populate a list of indices for the resulting signal
     result_min_index = min(indices1) + min(indices2)
     result_max_index = max(indices1) + max(indices2)
+
     result_indices = list(range(result_min_index, result_max_index + 1))
 
     # Initialize an array to hold the samples of the convolved signal
