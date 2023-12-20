@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import messagebox
 import math
+from Tasks import Task_4_5 as tsk4_5
 
 # Evaluation function (given):
 
@@ -332,12 +333,60 @@ def correlate_signals(indices1, samples1, indices2, samples2:list):
     
     return result_indices, result_samples
 
-# Main function
+def fast_convolve_signals(indices_1, samples_1, indices_2, samples_2, is_fast_correlation = False):
+
+    # Get length of the two signals
+    N1 = len(samples_1)
+    N2 = len(samples_2)
+            
+    # In fast convolution, padding is done and result indices have a special calculation
+    if not is_fast_correlation:
+        # Get the range of indices and populate a list of indices for the resulting signal
+        result_min_index = min(indices_1) + min(indices_2)
+        result_max_index = max(indices_1) + max(indices_2)
+
+        result_indices = list(range(result_min_index, result_max_index + 1))
+        
+        # Pad the two signals
+        samples_1 = np.pad(samples_1, (0, N2 - 1))
+        samples_2 = np.pad(samples_2, (0, N1 - 1))
+    
+    else:
+        result_indices = indices_1
+
+
+    # Apply DFT
+    dft_signal1= tsk4_5.compute_discrete_fourier_transform(samples_1)
+    dft_signal2 = tsk4_5.compute_discrete_fourier_transform(samples_2)
+    
+    if is_fast_correlation:
+        dft_signal1 = [x.conjugate() for x in dft_signal1]
+    
+    # Multiply in frequency domain to get the convolution (multiplication in frequency domain = convolution in time domain)
+    multiplication_result = [x1 * x2 for x1,x2 in zip(dft_signal1,dft_signal2)]
+
+    # Apply IDFT
+    _, amplitude, phase_shift = tsk4_5.compute_frequency_amplitude_phase_shift(0, multiplication_result) # Here sampling frequency is 0 and its return result is _ because it is irrelevant.
+    cartesian_points = tsk4_5.polar_to_cartesian(amplitude, phase_shift)
+    idft_result = tsk4_5.compute_discrete_fourier_transform(cartesian_points, isIDFT=True)
+    idft_result = [round(x.real, 2) for x in idft_result]
+    
+    if is_fast_correlation:
+        N = len(idft_result)
+        idft_result = [x / N for x in idft_result]
+        
+    # Print results
+    print("Result indices: ", result_indices)
+    print("Result samples: ", idft_result)
+    return result_indices, idft_result
+
+# Main function that calls other functions
 
 def do_operation(operation, user_input, is_fold= False):
     if operation == "":
         messagebox.showerror("error", "please select an operation")
         return
+    
     indices, samples, file_path = load_signal()
 
     # Smoothing
@@ -347,14 +396,10 @@ def do_operation(operation, user_input, is_fold= False):
         sharpen_signal(samples)
     elif operation == "Folding":
         fold_signal(indices, samples)
-    elif operation == "Delaying":
+    elif operation == "Shifting":
         if is_fold:
             samples = samples[::-1]
         shift_signal(indices, samples, -1 *  float(user_input))
-    elif operation == "Advancing":
-        if is_fold:
-            samples = samples[::-1]
-        shift_signal(indices, samples, float(user_input))
     elif operation == "Convolution":
         indices2, samples2, file_path = load_signal()
         result_indices, result_samples = convolve_signals(indices, samples, indices2, samples2)
@@ -364,4 +409,19 @@ def do_operation(operation, user_input, is_fold= False):
         result_indices, result_samples = correlate_signals(indices, samples, indices2, samples2)
         file_path = load_file_path()
         CorrTest(file_path, result_indices, result_samples)
+    elif operation == "Fast Convolution":
+        indices2, samples2, file_path = load_signal()
+        result_indices, result_samples = fast_convolve_signals(indices, samples, indices2, samples2)
+        ConvTest(result_indices, result_samples)
+    elif operation == "Fast Correlation":
+        indices2, samples2, file_path = load_signal()
+        result_indices, result_samples = fast_convolve_signals(indices, samples, indices2, samples2, is_fast_correlation=True)
+        file_path = load_file_path()
+        CorrTest(file_path, result_indices, result_samples)
+    elif operation == "Fast Auto Correlation":
+        result_indices, result_samples = fast_convolve_signals(indices, samples, indices, samples, is_fast_correlation=True)
+
+
+
+
 

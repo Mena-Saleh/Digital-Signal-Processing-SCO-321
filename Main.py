@@ -4,8 +4,7 @@ from Tasks import Task_1 as tsk1
 from Tasks import Task_2 as tsk2
 from Tasks import Task_3 as tsk3
 from Tasks import Task_4_5 as tsk4_5
-from Tasks import Task_6_7_8 as tsk6_7_8
-from Tasks import  Task_9 as tsk_9
+from Tasks import Task_6_7_8_9 as tsk6_7_8_9
 
 
 # Styling functions
@@ -281,14 +280,14 @@ def open_filters_and_shifting_window():
     operations_label.grid(row=0, column=0, padx=30, pady=(50,10), sticky="w")
     
     # Combobox for operations
-    cmb_operations = ttk.Combobox(filters_and_shifting_win, values=["Delaying", "Advancing", "Smoothing", "Sharpening", 
-                                                 "Folding", "Convolution", "Correlation"], width=widget_width-3)
+    cmb_operations = ttk.Combobox(filters_and_shifting_win, values=["Shifting", "Smoothing", "Sharpening", 
+                                                 "Folding", "Convolution", "Correlation", "Fast Convolution", "Fast Correlation", "Fast Auto Correlation"], width=widget_width-3)
     cmb_operations.grid(row=0, column=1, padx=30, pady=(50,10))
 
     # Only show the option to fold when using delaying or advancing operations
     def handle_combobox_selection(event):
         selected_option = cmb_operations.get()
-        if selected_option == "Delaying" or selected_option == "Advancing":
+        if selected_option == "Shifting":
             is_folding_check.config(state=tk.NORMAL)
         else:
             is_folding_check.config(state=tk.DISABLED)
@@ -312,7 +311,7 @@ def open_filters_and_shifting_window():
 
 
     # Button functions
-    btn_operate.config(command=lambda: tsk6_7_8.do_operation(cmb_operations.get(), txt_input.get(), is_folding_var.get()))
+    btn_operate.config(command=lambda: tsk6_7_8_9.do_operation(cmb_operations.get(), txt_input.get(), is_folding_var.get()))
 
     # Hover effects
     btn_operate.bind("<Enter>", on_enter)
@@ -361,8 +360,6 @@ btn_frequency_domain.pack(pady=10, padx=10)
 btn_filters_and_shifting = tk.Button(nav_frame, text="Filters & Shifting", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
 btn_filters_and_shifting.pack(pady=10, padx=10)
 
-btn_fast_conv = tk.Button(nav_frame, text="fast_conv", bg=colors["blue"], fg=colors["white"], width=15, height=2, relief="flat", bd=0)
-btn_fast_conv.pack(pady=10, padx=10)
 
 # Hover effects
 btn_browse.bind("<Enter>", on_enter)
@@ -383,8 +380,6 @@ btn_frequency_domain.bind("<Leave>", on_leave)
 btn_filters_and_shifting.bind("<Enter>", on_enter)
 btn_filters_and_shifting.bind("<Leave>", on_leave)
 
-btn_fast_conv.bind("<Enter>", on_enter)
-btn_fast_conv.bind("<Leave>", on_leave)
 
 
 # Buttons functions
@@ -395,7 +390,6 @@ btn_signal_operations.config(command=open_signal_operations_window)
 btn_signal_quantization.config(command=open_signal_quantization_window)
 btn_frequency_domain.config(command=open_frequency_domain_window)
 btn_filters_and_shifting.config(command=open_filters_and_shifting_window)
-btn_fast_conv.config(command=tsk_9.fast_conv)
 
 
 
