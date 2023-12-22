@@ -366,9 +366,7 @@ def fast_convolve_signals(indices_1, samples_1, indices_2, samples_2, is_fast_co
     multiplication_result = [x1 * x2 for x1,x2 in zip(dft_signal1,dft_signal2)]
 
     # Apply IDFT
-    _, amplitude, phase_shift = tsk4_5.compute_frequency_amplitude_phase_shift(0, multiplication_result) # Here sampling frequency is 0 and its return result is _ because it is irrelevant.
-    cartesian_points = tsk4_5.polar_to_cartesian(amplitude, phase_shift)
-    idft_result = tsk4_5.compute_discrete_fourier_transform(cartesian_points, isIDFT=True)
+    idft_result = tsk4_5.compute_discrete_fourier_transform(multiplication_result, isIDFT=True)
     idft_result = [round(x.real, 2) for x in idft_result]
     
     if is_fast_correlation:
